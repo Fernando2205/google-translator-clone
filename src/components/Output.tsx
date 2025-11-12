@@ -1,9 +1,15 @@
+import { CopyIcon } from './icons'
+import SpeakerButton from './ui/SpeakerButton'
 type OutputProps = {
   loading: boolean,
-  result: string
+  result: string,
+  onHandleSpeaker: () => void
 }
+function Output ({ loading, result, onHandleSpeaker }: OutputProps) {
+  const handleClipboard = () => {
+    navigator.clipboard.writeText(result)
+  }
 
-function Output ({ loading, result }: OutputProps) {
   return (
     <>
       {loading && (
@@ -18,6 +24,12 @@ function Output ({ loading, result }: OutputProps) {
           aria-live='polite'
         >
           {result || <span className='text-[#9aa0a6]'>Traducción</span>}
+          {result && (
+            <>
+              <button onClick={handleClipboard} className='hover:cursor-pointer  absolute bottom-4 left-4'> <CopyIcon color='white' /></button>
+              <SpeakerButton className='hover:cursor-pointer absolute bottom-4 left-16' onClick={onHandleSpeaker} />
+            </>)}
+
         </output>
       )}
     </>
