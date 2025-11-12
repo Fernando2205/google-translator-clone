@@ -60,6 +60,9 @@ const reducer = (state: State, action: Action) => {
     return {
       ...state,
       fromLanguage: state.toLanguage,
+      fromText: state.result,
+      result: '',
+      loading: state.result !== '',
       toLanguage: state.fromLanguage,
 
     }
