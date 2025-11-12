@@ -2,7 +2,7 @@ import { useTranslator } from './hooks/useTranslator'
 import { AUTO_LANGUAGE } from './constants'
 import { SwapButton } from './components/icons'
 import LanguageSelector from './components/LanguageSelector'
-import { SectionType } from './types.d'
+import { SectionType, type FromLanguage } from './types.d'
 import TextArea from './components/TextArea'
 import Output from './components/Output'
 import { useEffect } from 'react'
@@ -23,7 +23,7 @@ function App () {
     setResult
   } = useTranslator()
 
-  const debouncedText = useDebounce(fromText, 300)
+  const debouncedText = useDebounce(fromText)
   useEffect(() => {
     if (fromLanguage === toLanguage) {
       setResult(debouncedText)
@@ -38,8 +38,14 @@ function App () {
       .catch(err => {
         console.error('Error al traducir el texto:', err)
       })
+    console.log(debouncedText)
   }, [debouncedText, fromLanguage, toLanguage])
 
+  const handleSpeaker = ({ text, lang }:{ text: string, lang: FromLanguage }) => {
+    const utterance = new SpeechSynthesisUtterance(text)
+    utterance.lang = lang
+    speechSynthesis.speak(utterance)
+  }
   return (
     <div className='min-h-screen bg-[#202124]'>
       <div className='container mx-auto max-w-6xl px-4 py-8'>
@@ -78,13 +84,13 @@ function App () {
             {/* Text Areas */}
             <div className='grid grid-cols-1 md:grid-cols-2'>
               {/* Source Text Area */}
-              <div className='border-b border-[#3c4043] p-6 md:border-b-0 md:border-r md:border-[#3c4043]'>
-                <TextArea value={fromText} onChange={setFromText} />
+              <div className='relative border-b border-[#3c4043] p-6 md:border-b-0 md:border-r md:border-[#3c4043]'>
+                <TextArea value={fromText} onChange={setFromText} onSpeakerClick={() => handleSpeaker({ text: debouncedText, lang: fromLanguage })} />
               </div>
 
               {/* Translation Result Area */}
               <div className='relative bg-[#292a2d] p-6'>
-                <Output loading={loading} result={result} />
+                <Output loading={loading} result={result} onHandleSpeaker={() => handleSpeaker({ text: result, lang: toLanguage })} />
               </div>
             </div>
           </section>
